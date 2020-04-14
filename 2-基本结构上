@@ -1,0 +1,221 @@
+什么是线性结构？
+线性结构是一种有序数据项的集合，其中每个数据项都有唯一的前驱和后继
+新得数据项加入到数据集中时，只会加入到原有某个数据项之前或之后
+具有这种性质的数据集，就称为线性结构
+
+不同的线性结构的关键区别在于数据项增减的方式
+有的结构只允许数据项从一端添加，而有的结构则允许数据项从两端移除
+
+我们从4个最简单但功能最强大的结构入手，开始研究数据结构
+栈Stack，队列Queue，双端队列Deque和列表List
+这些数据集的共同点在于，数据项之间只存在先后的次序关系，都是线性结构
+
+
+栈stack:什么是栈
+一种有次序的数据项集合，在栈中，数据项的加入和移除都仅发生在同一段
+这一端叫栈"顶top"，另一端叫栈"底base"
+
+距离栈底越近的数据项，留在栈中的时间就越长
+而最新加入栈的数据项会被最先移除
+这种次序通常称为"后进先出LIFO"
+Last in First OUT
+这是一种基于数据项保存时间的次序，时间越短的莉栈顶越近，而时间越长的离栈底越近
+
+
+抽象数据类型"栈"定义为如下的操作
+Stack():创建一个空栈，不包含任何数据项
+push(item):将item加入栈顶，无返回值
+pop():将栈顶数据项移除，并返回，栈被修改
+peek():"窥视"栈顶数据项，返回栈顶的数据项但不移除，栈不被修改
+isEmpty():返回栈是否为空栈
+size():返回栈中有多少个数据项
+
+用python实现ADT Stack
+*在清楚地定义了抽象数据类型Stack之后，我们看看如何用python来实现它
+*Python的面向对象机制，可以用来实现用户自定义类型
+将ADT Stack实现为python的一个Class
+将ADT Stack的操作实现为Class的方法
+由于Stack是一个数据集，所以可以采用python的原生数据集来实现，我们选用最常用的数据集List来实现
+
+一个细节:Stack的两端对应list设置
+可以将List的任意一端（index=0或者-1）设置为栈顶
+我们选用List的末端（index=-1）作为栈顶
+这样栈的操作就可以通过对list的append和pop来实现
+
+class Stack:
+    def __init__(self):
+       self.item = []
+    def isEmpty(self):
+        return self.items == []
+    def push(self,items):
+        self.items.append(item)
+    def pop(self):
+        return self.items.pop()
+    def peek(self):
+        return self.items[len(self.items)-1]
+    def size(self):
+        return len(self.items)
+        
+不同的实现方案保持了ADT接口的稳定性
+但性能有所不同，栈顶首端的版本（下），其push/pop的复杂度为O（n），而栈顶
+尾端的实现（上），其push/pop的复杂度为O（1）
+
+def push（self，item）：
+    self.items.insert(0,item)
+def pop(self):
+    return self.items.pop(0)
+def peek(self):
+     return self.item[0]
+     
+ 栈的应用：简单括号匹配
+ 
+ from pythonds.basic.stack import Stack
+ 
+def parChecker(symbolString):
+     s=Stack()
+     balanced =True
+     index=0
+     while index <  len(symbolString) and balanced:
+          symbol = symbolString[index]
+          if symbol == "(":
+              s.push(symbol)
+          else:
+               if s.isEmpty():
+                  balanced = False
+               else:
+                  s.pop()
+          index = index + 1
+     if balanced and s.isEmpty():
+          return True
+     else:
+          return False
+print(parChecker("((()))"))
+print(parChecker("((()"))
+>>>
+True
+False
+
+     
+from pythonds.basic.stack import Stack
+ 
+def parChecker(symbolString):
+     s=Stack()
+     balanced =True
+     index=0
+     while index <  len(symbolString) and balanced:
+          symbol = symbolString[index]
+          if symbol == "([{":
+              s.push(symbol)
+          else:
+               if s.isEmpty():
+                  balanced = False
+               else:
+                  top = s.pop()
+                  if not matches(top,symbol):
+                          balanced = False
+          index = index + 1
+     if balanced and s.isEmpty():
+          return True
+     else:
+          return False     
+def matches(open,close):
+     open="([{"
+     closers =")]}"
+     return opens.index(open) == closers.index(close)
+  
+print(parChecker("{{([][])}()}"))
+print(parChecker("[{()]]"))  
+>>>
+False
+False
+    
+    
+ 栈的应用：十进制转换为二进制
+ 
+ 十进制转换为二进制，采用的是"除以2求余数"的算法
+ 将整数不断除以2，每次得到的余数就是由低到高的二进制位
+ 
+    
+  "除以2"的过程，得到的余数是从低到高的次序，而输出则是从高到低，所以需要以恶搞栈来反转次序
+  
+     
+from pythonds.basic.stack import Stack
+def divideBy2(decNumber):
+    remstack = Stack()
+    while decNumber >0:
+      rem = decNumber % 2
+      remstack.push(rem)
+      decNumber = decNumber // 2 #整数除
+   
+    binString = ""
+    while not remstack.isEmpty():
+        binString = binString + str(remstack.pop())
+    return binString
+print(divdeBy2(42))
+ 
+ 
+>>> 
+ 101010   
+
+十进制转换为二进制的算法，很容易可以扩展为转换到任意N进制
+只需要将"除以2求余数"算法改为"除以N求余数"算法就可以
+
+计算机中另外两种常用的进制是八进制和十六进制
+ 
+(233)10等于(351)8和(E9)16 # E=14
+    
+主要的问题是如何表示八进制和十六进制
+
+十进制转换为十六以下任意进制：代码
+from pythonds.basic.stack import Stack
+def baseConverter(decNumber,base):
+    digits="0123456789ABCDEF"
+    
+    remstack =Stack()
+    
+    while decNumber >0:
+      rem = decNumber % base
+      remstack.push(rem)
+      decNumber = decNumber // base #整数除
+   
+    newString = ""
+    while not remstack.isEmpty():
+        newString = newString + digits[remstack.pop()]
+    return newString
+
+print(baseConverter(25,2))
+print(baseConverter(25,16))
+
+>>>
+11001
+19
+
+表达式转换
+
+中缀表达式中的优先级
+人们引入了操作符优先级的概念来消除混淆
+同时还有括号
+
+前缀和后缀表达式
+
+计算机（后缀表达式）
+
+所以说，无论表达式多复杂，需要转换成前缀或者后缀，只需要两个步骤
+将中缀表达式转换为全括号形式
+将所有的操作符移动到子表达式所在的左括号（前缀）或者右括号（后缀）处
+替代之，再删除所有的括号
+
+总结下，再从左到右扫描逐个字符扫描中缀表达式的过程中，采用以恶搞栈来暂存未处理的操作符
+这样，栈顶的操作符就是最近暂存进去的，当遇到一个新得操作符，就需要跟栈顶的操作符比较下优先级，再进行处理
+
+首先，创建空栈opstack用于暂存操作符，空表postfixList用于保存后缀表达式
+将中缀表达式转换为单词（token）列表
+后面的算法描述中约定中缀表达式是由空格隔开的一些列单词（token）构成
+
+
+
+
+
+
+
+
