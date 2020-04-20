@@ -167,23 +167,225 @@ True
 
 无序表抽象数据类型
 
+列表List:什么是列表
+一种数据项按照相对位置存放的数据集
+特别的，被称为“无序表”
+其中数据项只按照存放位置来索引，如第1个、第2个......最后一个等。
+
+抽象数据类型：无序表List
+List():创建一个空列表
+add(item)：添加一个数据项到列表中，假设item原先不存在于列表中
+remove()item:从列表中移除item，列表被修改，item原先应存在于表中
+search（item):在列表中查找item，返回布尔类型值
+isEmpty():返回列表是否为空
+size():返回列表包含了多少数据项
+
+append(item):添加一个数据项到表末尾，假设item原先不存在于列表中
+index(item)：返回数据项插入到位置pos，
+假设item原先不存在列表中，同时原列表具有足够多个数据项，能让item占据位置pos
+pop()：从列表末尾移除数据项，假设源列表至少有一个数据项
+pop(pos)：移除位置为pos的数据项，假设原列表存在位置pos
 
 
+采用链表实现无序表
+为了实现无序表数据结构，可以采用链接表的方案
+虽然列表数据结构要求保持数据项的前后想怼位置，但这种前后位置的保持
+并不要求数据项一次存放在连续的存储空间
 
 
+采用链表实现无序表
+数据项存放位置并没有规则，但如果在数据项之间建立链接指向，就可以保持其前后相对位置
+
+链表实现：节点Node
+链表实现的最基本元素是节点Node
+每个节点至少要包含2个信息：数据项本身，以及指向下一个节点的引用信息
+注意next为None的意义是没有下一个节点了
+这个很重要
+
+链表实现：节点Node
+
+class Node:
+    def __init__(self,initdata):
+        self.data = initdata
+        self.next = None
+    def getData(self):
+        return self.data
+    def getNext(self):
+        return self.next
+    def setData(self,newdata):
+        self.data = newdata
+    def setNext(self,newnext):
+        self.next = newnext
+
+temp = Node(93)
+
+print(temp.getData())
+>>>
+93
+
+链表实现:无序表
+可以采用链接节点的方式构建数据集来实现无序表
+链表的第一个和最后一个节点最重要
+如果想访问到链表中的所有节点，就必须从第一个节点开始沿着链接遍历下去
+
+所以无序表必须要有对第一个节点的引用信息
+设立一个属性head，保存对第一个节点的引用空表的head为None
+
+class UnorderedList:
+    def __init__(self):
+        self.head = None
+        
+
+mylist = UnorderedList()
+print(mylist.head)
+>>>
+None
+
+随着数据项的加入，无序表的head始终指向链条中的第一个节点
+注意！无序表mylist对象本身并不包含数据项(数据项在节点中)
+其中包含的head只是对首个节点Node的引用判断空表的isEmpty()很容易实现
+
+链表实现:无序表UnorderList
+*接下来，考虑注入实现向无序表中添加数据项，实现add方法
+*由于无序表并没有限定数据项之间的顺序
+*新数据项可以加入到原表中的任何位置
+*按照实现的性能考虑，应添加到最容易加入的位置上。
 
 
+有链表结构我们知道要访问到整条链上的所有数据项
+都必须从表头head开始沿着next链接逐个向后查找
+所以添加新数据项最快捷的位置是表头，整个链表的首位置
+
+链表实现:add方法实现
+链接次序很重要
+def add(self,item):
+    temp = Node(item)
+    temp.setNext(self.head)
+    self.head = temp
+
+链表实现:size
+size：从链条头head开始遍历到表尾同时用变量累加经过的节点个数
+def size(self):
+    current = self.head
+    count = 0
+    while current != None:
+        count = count + 1
+        current = current.getNext()
+    return count
+链表实现:search
+从链表头head开始遍历到表尾，同时判断当前节点的数据项是否目标
+
+def search(self,item):
+    current = self.head
+    found = False
+    while current != None and not found :
+        if current.getData() == item:
+            found = True
+        else:
+            current = current.getNext()
+    return found
+
+链表实现:remove(item)方法
+首先要找到item，这个过程跟search一样，但在删除节点时，需要特别的技巧
+current指向的是当前匹配数据项的节点
+而删除需要把前一个节点的next指向current的下一个节点
+所以我们在search current的同时，还要维护前一个(previous)节点的引用
 
 
+找到item之后，curret指向item节点，previous指向前一个节点，开始执行删除，
+需要区分两种情况:
+current是首个节点；或者是位于链条中间的节点
+def remove(self,item):
+    current = self.head
+    previous = None
+    found = false
+    while not found:
+        if current.getData() == item:
+            found = True
+        else:
+            previous = current
+            current = current.getNext()
+    if previous == None:
+        self.head = current.getNext()
+    else:
+        previous.setNext(current.getNext())
+        
+抽象数据类型：有序表OrderList
+有序表是一种数据项依照其某可比性质(如整数大小、字母表先后)来决定在列表中的位置
+越“小”的数据项越靠近列表的头，越靠“前”
+
+有序表所定义的操作如下：
+OrderedList():创建一个空的有序表
+add(item):在表中添加一个数据项，并保持整体顺序，此项原不存在
+remove(item):从有序表中移除一个数据项，此项应存在，有序表被修改
+search(item):在有序表中查找数据项，返回是否存在isEmpty():是否空表
+size()：返回表中数据项的个数
+index(item)：返回数据项在表中的位置，此项应存在
+pop():移除并返回有序表中最后一项，表中应至少存在一项
+pop(pos):移除并返回有序表中指定位置的数据项，此位置应存在
 
 
+在实现有序表的时候，需要记住的是，数据项的想对位置，取决于他们之间的“大小”比较
+由于Python的扩展性，下面对数据项的讨论并不仅适用于整数，可适用于所有定义了_get_
+方法（即'>'操作符）的 数据类型
+
+同样采用链表方法实现
+Node定义相同
+OraerList也设置一个head来保存链表表头的引用
+
+class OrderList:
+    def __init__(self):
+        self.head = None
 
 
+对于isEmpty/size/remove这些方法，与节点的次序无关，所以其实现跟UnorderedList是一样的
+search/add方法则需要有修改
 
+search方法:与无序表不相同，有序表，一旦当前节点的数据项大于所要查找的数据项，则
+说明链表后面已经不可能再有要查找的数据项，可以直接返回False
 
+def search(self,item):
+    current = self.head
+    found = False
+    while current != None and not found and not stop:
+        if current.getData() == item:
+            found = True
+        else:
+            if current.getData() > item：
+                stop = True
+            else:
+                current = current.getNext()
+    return found
 
+add方法:与无序表不同，有序表需要查找合适位置，使其有序性不被破坏
 
+需要设置"前驱“
 
+def add(self,item):
+    current = self.head
+    previous = None
+    stop = False
+    while current != None and not stop:
+        #发现插入位置
+        if current.getData()>item:
+            stop = True
+        else:
+            previous = current
+            current = current.getNext()
+    temp = Node(item)
+    #插入表头
+    if previous == None:
+        tremp.setNext(self.head)
+        self.head = temp
+    #插入表中
+    else:
+        temp.setNext(self.head)
+        self.head = temp
+        
+#关于链表复杂度的分析，主要是看相应的方法是否涉及到链表的遍历
+isEmpty(O(1))
+size(O(n))
+search/remove/add（O(n)） 按照概率其平均操作的次数是n/2
 
 
 
