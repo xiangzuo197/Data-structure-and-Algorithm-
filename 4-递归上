@@ -149,12 +149,117 @@ t.hideturtle()
 turtle.done()
 
 递归可视化:谢尔宾斯基三角形
+import turtle
+def sierpinski(degree,points):
+    colormap = ['blue','red','green','white','yellow','orange']
+    #等边三角形
+    drawTriangle(points,colormap[degree])
+    if degree > 0:
+        #最小规模,0直接退出
+        #减小规模：getMid边长减半
+        #调用自身，左上右次序
+        sierpinski(degree - 1,
+                   {'left':points['left'],
+                    'top':getMid(points['left'],points['top']),
+                    'right':getMid(points['left'],points['right'])})
+            
+        sierpinski(degree - 1,
+                   {'left':getMid(points['left'],points['top']),
+                    'top':points['top'],
+                    'right':getMid(points['top'],points['right'])})
+
+        sierpinski(degree - 1,
+                   {'left':getMid(points['left'],points['right']),
+                    'top':getMid(points['top'],points['right']),
+                    'right':points['right']})
+
+#绘制等边三角形
+
+def drawTriangle(points,color):
+    t.fillcolor(color)
+    t.penup()
+    t.goto(points['top'])
+    t.pendown()
+    t.begin_fill()
+    t.goto(points['left'])
+    t.goto(points['right'])
+    t.goto(points['top'])
+    t.end_fill()
+
+
+def getMid(p1,p2):
+    #取两个点的中点
+    return ((p1[0] + p2[0])/2,(p1[1] + p2[1])/2)
+
+t = turtle.Turtle()
+#外轮廓三个顶点
+
+points = {'left':(-200,-100),
+          'top':(0,200),
+          'right':(200,-100)}
+#画degree = 5的三角形
+sierpinski(5,points)
+turtle.done
 
 
 
 
 汉诺塔的问题
 
+def moveTower(height,fromPole,withPole,toPole):
+    if height >= 1:
+        moveTower(height - 1,fromPole,toPole,withPole)
+        moveDisk(height,fromPole,toPole)
+        moveTower(height - 1,withPole,fromPole,toPole)
+def moveDisk(disk,fromPole,toPole):
+    print(f"Moving disk[{disk}] from {fromPole} to {toPole}")
+print(moveTower(3,"#1","#2","#3"))
+>>>
+Moving disk[1] from #1 to #3
+Moving disk[2] from #1 to #2
+Moving disk[1] from #3 to #2
+Moving disk[3] from #1 to #3
+Moving disk[1] from #2 to #1
+Moving disk[2] from #2 to #3
+Moving disk[1] from #1 to #3
+None
+
+
 探索迷宫
+def searchFrom(maze,startRow,startColumn):
+    maze.updatePosition(startRow,startColumn)
+    # 1.碰到墙壁，返回失败
+    if maze[startRow][starColumn] == OBSTACLE:
+        return False
+    # 2.碰到面包屑，或者死胡同，返回失败
+    if maze[startRow][startColumn] == TRIED or \
+       maze[startRow][startColumn] == DEAD_END:
+        return False
+    # 3.碰到了出口，返回成功！
+    if maze.isExit(startRow,startColumn):
+        maze.updatePosition(starRow,startColumn,PART_OF_PATH)
+        return True
+    # 4.洒一下面包屑，继续探索
+    maze.updatePosition(startRow,startColumn,TRIED)
+    # 向北南西东4个方向一次探索，or操作符具有短路效应
+    found = searchFrom(maze,startRow-1,startColumn) or \
+            searchFrom(maze,startRow+1,startColumn) or \
+            searchFrom(maze,startRow,startColumn-1) or \
+            searchFrom(maze,startRow,startColumn+1) 
+    # 如果探索成功，标记当前点，失败则标记为"死胡同"
+    if found:
+        maze.updatePosition(startRow,startColumn,PART_OF_PATH)
+    else:
+        maze.updatePosition(startRow,startColumn,PART_OF_PATH)
+    return found
+
+
+
+
+
+
+
+
+
 
 
